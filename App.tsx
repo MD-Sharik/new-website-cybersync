@@ -45,7 +45,7 @@ function App() {
     <>
       {showSplash && (
         <VideoSplash
-          videoSrc="/Glossy Logo.mp4"
+          videoSrc="/Final2.mp4"
           onComplete={() => setShowSplash(false)}
           minDuration={3000}
         />
@@ -53,7 +53,7 @@ function App() {
       
       {!showSplash && (
         <Router>
-          <div className="min-h-screen bg-cyber-black text-white selection:bg-cyber-primary selection:text-black">
+          <div className="min-h-screen  text-white">
             <Layout>
               <Routes>
                 <Route path="/" element={<Home />} />

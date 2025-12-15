@@ -13,7 +13,20 @@ export const VideoSplash: React.FC<VideoSplashProps> = ({
 }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isVisible, setIsVisible] = useState(true);
+  const [isFading, setIsFading] = useState(false);
   const timeoutRef = useRef<number | null>(null);
+  const fadeTimeoutRef = useRef<number | null>(null);
+
+  const handleComplete = () => {
+    // Start fade animation
+    setIsFading(true);
+    // Remove from DOM after fade completes (500ms)
+    if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
+    fadeTimeoutRef.current = window.setTimeout(() => {
+      setIsVisible(false);
+      onComplete();
+    }, 500);
+  };
 
   useEffect(() => {
     const video = videoRef.current;
@@ -21,15 +34,13 @@ export const VideoSplash: React.FC<VideoSplashProps> = ({
 
     // Handle video end
     const handleVideoEnd = () => {
-      setIsVisible(false);
-      onComplete();
+      handleComplete();
     };
 
     // Handle video error - skip splash if video fails to load
     const handleVideoError = () => {
       console.warn('Video failed to load, skipping splash screen');
-      setIsVisible(false);
-      onComplete();
+      handleComplete();
     };
 
     // Ensure minimum display time before transitioning
@@ -38,8 +49,7 @@ export const VideoSplash: React.FC<VideoSplashProps> = ({
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       timeoutRef.current = window.setTimeout(() => {
         if (video.paused) {
-          setIsVisible(false);
-          onComplete();
+          handleComplete();
         }
       }, minDuration);
     };
@@ -51,8 +61,7 @@ export const VideoSplash: React.FC<VideoSplashProps> = ({
     // Auto-play the video
     video.play().catch((err) => {
       console.warn('Video autoplay failed:', err);
-      setIsVisible(false);
-      onComplete();
+      handleComplete();
     });
 
     return () => {
@@ -60,31 +69,33 @@ export const VideoSplash: React.FC<VideoSplashProps> = ({
       video.removeEventListener('error', handleVideoError);
       video.removeEventListener('canplay', handleCanPlay);
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
+      if (fadeTimeoutRef.current) clearTimeout(fadeTimeoutRef.current);
     };
   }, [onComplete, minDuration]);
 
   if (!isVisible) return null;
 
   return (
-    <div className="fixed inset-0 z-50 bg-black flex items-center justify-center">
+    <div className={`fixed inset-0 z-50 bg-black flex items-center justify-center transition-opacity duration-500 ${
+      isFading ? 'opacity-0' : 'opacity-100'
+    }`}>
       <video
         ref={videoRef}
         src={videoSrc}
-        className="w-full h-full object-cover"
+        className="w-full h-full object-contain"
         autoPlay
         muted
         playsInline
       />
       {/* Skip button (optional) */}
-      <button
+      {/* <button
         onClick={() => {
-          setIsVisible(false);
-          onComplete();
+          handleComplete();
         }}
         className="absolute bottom-6 right-6 px-4 py-2 bg-white/10 hover:bg-white/20 text-white text-sm font-bold rounded transition-colors backdrop-blur-sm"
       >
         Skip
-      </button>
+      </button> */}
     </div>
   );
 };
