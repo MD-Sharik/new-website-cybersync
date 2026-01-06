@@ -45,12 +45,12 @@ const SOLUTIONS_LIST = [
   },
   {
     id: 'ai',
-    title: 'Enterprise AI & ML',
-    description: 'Next-gen AI development. Featuring our custom Enterprise GPT wrapper (in dev) and scalable ML platforms.',
+    title: 'AI & ML',
+    description: 'Next-gen AI development. Featuring our custom RAG based solution and scalable ML platforms.',
     icon:'./product/ai.jpg',
     color: 'text-cyber-secondary',
     items: [
-      'Enterprise GPT Wrapper',
+      'RAG based solution',
       'NLP Solutions',
       'Computer Vision',
       'ML Platforms'
