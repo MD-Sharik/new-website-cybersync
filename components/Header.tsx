@@ -45,11 +45,11 @@ const SOLUTION_MENU: NavItem[] = [
   { label: 'Digital Twins', href: '/solutions/engineering' },
   { label: 'Control Design', href: '/solutions/engineering' },
 
-  { label: 'RAG AI', href: '/solutions/ai', isSectionHeader: true },
+  { label: 'AI solution', href: '/solutions/ai', isSectionHeader: true },
   { label: 'NLP Solutions', href: '/solutions/ai' },
   { label: 'Computer Vision', href: '/solutions/ai' },
   { label: 'ML Platforms', href: '/solutions/ai' },
-  { label: 'Enterprise GPT', href: '/solutions/ai' },
+  { label: 'RAG', href: '/solutions/ai' },
 
   { label: 'SAP Consulting', href: '/solutions/sap', isSectionHeader: true },
   { label: 'S/4HANA Migration', href: '/solutions/sap' },
