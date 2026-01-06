@@ -94,7 +94,7 @@ export const Footer: React.FC = () => {
             <ul className="space-y-3 text-sm text-gray-400">
               <li><Link to="/solutions/data" className="hover:text-cyber-secondary hover:pl-2 transition-all block">Data & Analytics</Link></li>
               <li><Link to="/solutions/engineering" className="hover:text-cyber-secondary hover:pl-2 transition-all block">Engineering Modeling</Link></li>
-              <li><Link to="/solutions/ai" className="hover:text-cyber-secondary hover:pl-2 transition-all block">Enterprise AI & GPT</Link></li>
+              <li><Link to="/solutions/ai" className="hover:text-cyber-secondary hover:pl-2 transition-all block">RAG AI</Link></li>
               <li><Link to="/solutions/sap" className="hover:text-cyber-secondary hover:pl-2 transition-all block">SAP Consulting</Link></li>
               <li><Link to="/solutions/enterprise" className="hover:text-cyber-secondary hover:pl-2 transition-all block">Custom ERP & EDLI</Link></li>
               <li><Link to="/solutions/pos" className="hover:text-cyber-secondary hover:pl-2 transition-all block">POS & Supply Chain</Link></li>
