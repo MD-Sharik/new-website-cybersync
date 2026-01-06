@@ -121,13 +121,13 @@ const SOLUTIONS_DATA: Record<string, Solution> = {
   },
   'ai': {
     id: 'ai',
-    title: 'Enterprise AI & Custom Development',
+    title: 'RAG AI & Custom Development',
     heroImage: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=2000',
-    shortDesc: 'Enterprise GPT, NLP, and Computer Vision.',
+    shortDesc: 'RAG AI, NLP, and Computer Vision.',
     fullDesc: 'We push the boundaries of what is possible with Enterprise AI. Our flagship offering in development is the "Enterprise GPT", a private AI wrapper ensuring data privacy similar to watsonx.ai. We also engineer sophisticated Natural Language Processing (NLP) models and Computer Vision systems. We help you move from AI proof-of-concept to production-grade deployment.',
     benefits: ['Secure, private AI interactions', 'Automate repetitive cognitive tasks', 'Modernize legacy applications', 'Secure cloud infrastructure'],
     capabilities: [
-        { title: 'Enterprise GPT (In Dev)', desc: 'A secure, private GenAI wrapper built on open-source LLMs. Designed to be deployed within your infrastructure for data privacy.', icon: MessageSquare },
+        { title: 'RAG Solution', desc: 'A secure, private GenAI wrapper built on open-source LLMs. Designed to be deployed within your infrastructure for data privacy.', icon: MessageSquare },
         { title: 'NLP Solutions', desc: 'Document summarization, sentiment analysis, and intelligent search engines using Large Language Models (LLMs).', icon: Code },
         { title: 'Computer Vision', desc: 'Automated visual inspection, facial recognition, and object detection systems for manufacturing and security.', icon: Eye },
         { title: 'ML Platforms', desc: 'End-to-end MLOps pipelines for training, deploying, and monitoring machine learning models.', icon: Cpu }
