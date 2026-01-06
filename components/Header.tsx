@@ -45,7 +45,7 @@ const SOLUTION_MENU: NavItem[] = [
   { label: 'Digital Twins', href: '/solutions/engineering' },
   { label: 'Control Design', href: '/solutions/engineering' },
 
-  { label: 'Enterprise AI', href: '/solutions/ai', isSectionHeader: true },
+  { label: 'RAG AI', href: '/solutions/ai', isSectionHeader: true },
   { label: 'NLP Solutions', href: '/solutions/ai' },
   { label: 'Computer Vision', href: '/solutions/ai' },
   { label: 'ML Platforms', href: '/solutions/ai' },
@@ -128,7 +128,7 @@ export const Header: React.FC = () => {
         color: 'bg-cyber-maple',
         textColor: 'text-cyber-primary',
         glow: 'bg-cyber-maple/20',
-        title: 'Enterprise AI',
+        title: 'RAG AI',
         desc: 'Transform your business with custom ERP, CRM, and Generative AI solutions tailored to your workflow.',
         linkText: 'Discover AI',
         linkHref: '/solutions/ai',
