@@ -18,20 +18,23 @@ import { PrivacyPolicy } from './pages/PrivacyPolicy';
 import { TermsOfService } from './pages/TermsOfService';
 import { TechCoreDetail } from './pages/TechCoreDetail';
 
+import AddBlog from './pages/AddBlog';
+
 
 
 const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const location = useLocation();
   const isDashboard = location.pathname === '/dashboard';
+  const isCreator = location.pathname.startsWith('/creator');
 
   return (
     <>
-      {!isDashboard && <Header />}
+      {!isDashboard && !isCreator && <Header />}
       <main className="min-h-screen">
         {children}
       </main>
-      {!isDashboard && <Footer />}
-      <SiteAssistant />
+      {!isDashboard && !isCreator && <Footer />}
+      {!isCreator && <SiteAssistant />}
     </>
   );
 };
@@ -39,14 +42,23 @@ const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
+  // Check localStorage to see if we should show splash (only on first visit)
+  const [showSplash, setShowSplash] = useState(() => {
+    const splashShown = localStorage.getItem('cybersync_splash_shown');
+    return !splashShown;
+  });
+
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+    localStorage.setItem('cybersync_splash_shown', 'true');
+  };
 
   return (
     <>
       {showSplash && (
         <VideoSplash
           videoSrc="/Final2.mp4"
-          onComplete={() => setShowSplash(false)}
+          onComplete={handleSplashComplete}
           minDuration={3000}
         />
       )}
@@ -69,6 +81,7 @@ function App() {
                 <Route path="/blog/:id" element={<BlogDetail />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsOfService />} />
+                <Route path="/creator/addblog" element={<AddBlog />} />
               </Routes>
             </Layout>
           </div>

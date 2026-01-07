@@ -1,27 +1,39 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Calendar, User, Share2, Copy, Linkedin, Twitter, Check } from 'lucide-react';
+import { ArrowLeft, Calendar, User, Share2, Copy, Linkedin, Twitter, Check, Loader2 } from 'lucide-react';
 import { BlogPost } from '../types';
-import { DEFAULT_POSTS } from './Blog';
 
 export const BlogDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [post, setPost] = useState<BlogPost | null>(null);
+  const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
 
   useEffect(() => {
-    // 1. Get posts from local storage
-    const storedPostsStr = localStorage.getItem('cyber_blog_posts');
-    const storedPosts: BlogPost[] = storedPostsStr ? JSON.parse(storedPostsStr) : [];
-    
-    // 2. Merge with defaults
-    const allPosts = [...storedPosts, ...DEFAULT_POSTS];
-    
-    // 3. Find matching post
-    if (id) {
-        const found = allPosts.find(p => p.id.toString() === id);
-        setPost(found || null);
-    }
+    // Fetch blog post from API
+    if (!id) return;
+    fetch(`/api/blogs/${id}`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.blog) {
+          const blog = data.blog;
+          setPost({
+            id: blog.id || blog._id,
+            title: blog.title,
+            content: blog.content,
+            excerpt: blog.excerpt || (blog.content ? blog.content.slice(0, 160) + '...' : ''),
+            date: blog.date ? new Date(blog.date).toLocaleDateString() : '',
+            author: blog.author || 'Admin',
+            category: blog.category || 'General',
+            image: blog.image || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600'
+          });
+        }
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error('Error fetching blog:', err);
+        setLoading(false);
+      });
   }, [id]);
 
   const handleCopyLink = async () => {
@@ -55,6 +67,17 @@ export const BlogDetail: React.FC = () => {
       window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank', 'width=550,height=520');
   };
 
+  if (loading) {
+    return (
+        <div className="min-h-screen bg-cyber-black pt-32 text-center text-white flex items-center justify-center">
+            <div className="flex flex-col items-center gap-4">
+              <Loader2 className="animate-spin" size={40} />
+              <p className="text-gray-400">Loading article...</p>
+            </div>
+        </div>
+    );
+  }
+
   if (!post) {
     return (
         <div className="min-h-screen bg-cyber-black pt-32 text-center text-white">
@@ -65,13 +88,13 @@ export const BlogDetail: React.FC = () => {
   }
 
   return (
-    <div className="pt-24 pb-20 bg-cyber-black min-h-screen">
-      {/* Hero Image */}
-      <div className="w-full h-[400px] relative">
-         <img src={post.image} alt={post.title} className="w-full h-full object-cover opacity-60" />
-         <div className="absolute inset-0 bg-gradient-to-t from-cyber-black via-cyber-black/50 to-transparent"></div>
-         <div className="absolute bottom-0 left-0 w-full p-8 md:p-16">
-            <div className="max-w-4xl mx-auto">
+    <div className="bg-cyber-black min-h-screen">
+      {/* Hero Image with Title */}
+      <div className="w-full relative" style={{ paddingBottom: '280px' }}>
+         <img src={post.image} alt={post.title} className="w-full h-[400px] object-cover opacity-60 absolute top-0" />
+         <div className="absolute inset-0 top-0 h-[400px] bg-gradient-to-t from-cyber-black via-cyber-black/50 to-transparent"></div>
+         <div className="relative z-10 pt-32 px-4">
+            <div className="max-w-3xl mx-auto">
                 <Link to="/blog" className="inline-flex items-center text-cyber-primary font-bold uppercase text-xs mb-6 hover:text-white transition-colors tracking-widest">
                     <ArrowLeft size={16} className="mr-2" /> Back to Blog
                 </Link>
@@ -80,24 +103,24 @@ export const BlogDetail: React.FC = () => {
                     <div className="flex items-center gap-1"><Calendar size={14}/> {post.date}</div>
                     <div className="flex items-center gap-1"><User size={14}/> {post.author}</div>
                 </div>
-                <h1 className="text-3xl md:text-5xl font-bold text-white leading-tight">{post.title}</h1>
+                <h1 className="text-4xl md:text-5xl font-bold text-white leading-tight mb-12">{post.title}</h1>
             </div>
          </div>
       </div>
 
       {/* Content */}
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 mt-12">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 pb-20">
          {/* Introduction/Excerpt */}
-         <div className="text-xl text-gray-300 leading-relaxed mb-10 border-l-4 border-cyber-secondary pl-6 font-light italic">
+         <div className="text-lg text-gray-300 leading-relaxed mb-10 border-l-4 border-cyber-secondary pl-6 font-light italic">
             {post.excerpt}
          </div>
 
          {/* Main Body */}
-         <div 
-            className="prose prose-invert prose-lg max-w-none prose-headings:text-white prose-a:text-cyber-primary prose-strong:text-white prose-code:text-cyber-secondary"
-            dangerouslySetInnerHTML={{ __html: post.content || '' }}
-         >
-         </div>
+         <article className="text-gray-300 leading-relaxed space-y-6 text-base">
+            {post.content.split('\n').map((paragraph, idx) => (
+              paragraph.trim() && <p key={idx}>{paragraph}</p>
+            ))}
+         </article>
 
          {/* Share / Footer */}
          <div className="mt-16 pt-8 border-t border-white/10 flex flex-col sm:flex-row justify-between items-center gap-4">

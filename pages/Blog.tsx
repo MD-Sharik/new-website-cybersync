@@ -3,86 +3,64 @@ import { Calendar, User, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react'
 import { Link } from 'react-router-dom';
 import { BlogPost } from '../types';
 
-export const DEFAULT_POSTS: BlogPost[] = [
-  {
-    id: 1,
-    title: 'The Future of Digital Twins in Manufacturing',
-    excerpt: 'How MapleSim is revolutionizing the way engineers model physical systems before production begins.',
-    content: '<p>Digital twins are rapidly becoming a cornerstone of modern manufacturing...</p><p>By using MapleSim, engineers can create high-fidelity models that simulate real-world physics...</p>',
-    date: 'Oct 12, 2024',
-    author: 'Dr. Sarah Chen',
-    category: 'Engineering',
-    image: 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600'
-  },
-  {
-    id: 2,
-    title: 'Unlocking Insights with Structural Equation Modeling',
-    excerpt: 'A deep dive into why SmartPLS 4 is the preferred tool for complex social science research.',
-    content: '<p>Structural Equation Modeling (SEM) allows researchers to test complex theories...</p>',
-    date: 'Sep 28, 2024',
-    author: 'James Wilson',
-    category: 'Analytics',
-    image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600'
-  },
-  {
-    id: 3,
-    title: 'Transforming STEM Education with Maple Learn',
-    excerpt: 'Moving beyond static textbooks: How interactive courseware improves student retention rates.',
-    content: '<p>Education is evolving. Static PDFs are no longer enough to engage students...</p>',
-    date: 'Sep 15, 2024',
-    author: 'Priya Patel',
-    category: 'Education',
-    image: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&q=80&w=600'
-  },
-  {
-    id: 4,
-    title: 'Enterprise AI: Beyond the Hype',
-    excerpt: 'Practical applications of Generative AI in customer support and document automation.',
-    content: '<p>Generative AI is more than just a buzzword. It is driving real efficiency...</p>',
-    date: 'Aug 30, 2024',
-    author: 'Vikram Singh',
-    category: 'AI & Tech',
-    image: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=600'
-  }
-];
-
 export const Blog: React.FC = () => {
-  const [posts, setPosts] = useState<BlogPost[]>(DEFAULT_POSTS);
+  const [posts, setPosts] = useState<BlogPost[]>([]);
   const [email, setEmail] = useState('');
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Load dynamically created posts from Dashboard
-    const storedPosts = localStorage.getItem('cyber_blog_posts');
-    if (storedPosts) {
-      const parsedPosts = JSON.parse(storedPosts);
-      // Merge new posts at the top
-      setPosts([...parsedPosts, ...DEFAULT_POSTS]);
-    }
+    fetch('/api/blogs')
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && Array.isArray(data.blogs)) {
+          setPosts(data.blogs.map((post: any) => ({
+            id: post.id || post._id,
+            title: post.title,
+            excerpt: post.excerpt || (post.content ? post.content.slice(0, 150) + '...' : ''),
+            author: post.author || 'Admin',
+            category: post.category || 'General',
+            image: post.image || 'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?auto=format&fit=crop&q=80&w=600',
+            date: post.date ? new Date(post.date).toLocaleDateString() : '',
+            content: post.content
+          })));
+        }
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
+
+
 
   const handleSubscribe = (e: React.FormEvent) => {
     e.preventDefault();
     if (email && email.includes('@')) {
       setIsSubmitting(true);
-      // Simulate API submission
-      setTimeout(() => {
-        setIsSubscribed(true);
-        setIsSubmitting(false);
-        setEmail('');
-        
-        // Reset success message after 3 seconds so user can subscribe another email if needed
-        setTimeout(() => setIsSubscribed(false), 3000);
-      }, 1500);
+      fetch('/api/subscribe', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            setIsSubscribed(true);
+            setEmail('');
+            setTimeout(() => setIsSubscribed(false), 3000);
+          } else {
+            console.error('Subscription error:', data.message);
+          }
+        })
+        .catch(err => console.error('Subscription error:', err))
+        .finally(() => setIsSubmitting(false));
     }
   };
+
 
   return (
     <div className="pt-24 pb-20 bg-cyber-black min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
-        {/* Header */}
         <div className="text-center mb-16 animate-fade-in">
           <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 uppercase tracking-tight">
             Insights & <span className="text-cyber-primary">News</span>
@@ -93,49 +71,56 @@ export const Blog: React.FC = () => {
         </div>
 
         {/* Blog Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-          {posts.map((post) => (
-            <article key={post.id} className="group bg-cyber-panel border border-white/5 rounded-2xl overflow-hidden hover:border-cyber-primary/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,240,255,0.1)] flex flex-col h-full">
-              <div className="h-64 overflow-hidden relative flex-shrink-0">
-                 <div className="absolute top-4 left-4 z-10">
+        {loading ? (
+          <div className="text-center py-20">
+            <Loader2 className="animate-spin mx-auto" size={40} />
+            <p className="mt-4 text-gray-400">Loading blogs...</p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+            {posts.map((post) => (
+              <article key={post.id} className="group bg-cyber-panel border border-white/5 rounded-2xl overflow-hidden hover:border-cyber-primary/50 transition-all duration-300 hover:shadow-[0_0_30px_rgba(0,240,255,0.1)] flex flex-col h-full">
+                <div className="h-64 overflow-hidden relative flex-shrink-0">
+                  <div className="absolute top-4 left-4 z-10">
                     <span className="px-3 py-1 bg-cyber-black/80 backdrop-blur-md text-cyber-primary text-xs font-bold uppercase tracking-wider rounded border border-cyber-primary/30">
-                       {post.category}
+                      {post.category}
                     </span>
-                 </div>
-                 <img 
-                   src={post.image} 
-                   alt={post.title} 
-                   className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
-                 />
-                 <div className="absolute inset-0 bg-gradient-to-t from-cyber-panel to-transparent opacity-90"></div>
-              </div>
+                  </div>
+                  <img 
+                    src={post.image} 
+                    alt={post.title} 
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700 opacity-80 group-hover:opacity-100"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-cyber-panel to-transparent opacity-90"></div>
+                </div>
 
-              <div className="p-8 relative -mt-12 z-10 flex flex-col flex-1">
-                 <div className="flex items-center gap-4 text-xs text-gray-500 mb-4 font-mono">
+                <div className="p-8 relative -mt-12 z-10 flex flex-col flex-1">
+                  <div className="flex items-center gap-4 text-xs text-gray-500 mb-4 font-mono">
                     <div className="flex items-center gap-1">
-                       <Calendar size={14} />
-                       <span>{post.date}</span>
+                      <Calendar size={14} />
+                      <span>{post.date}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                       <User size={14} />
-                       <span>{post.author}</span>
+                      <User size={14} />
+                      <span>{post.author}</span>
                     </div>
-                 </div>
+                  </div>
 
-                 <h2 className="text-2xl font-bold text-white mb-4 group-hover:text-cyber-primary transition-colors">
+                  <h2 className="text-2xl font-bold text-white mb-4 group-hover:text-cyber-primary transition-colors line-clamp-2">
                     {post.title}
-                 </h2>
-                 <p className="text-gray-400 mb-6 leading-relaxed flex-1 line-clamp-3">
+                  </h2>
+                  <p className="text-gray-400 mb-6 leading-relaxed flex-1 line-clamp-2 text-sm">
                     {post.excerpt}
-                 </p>
+                  </p>
 
-                 <Link to={`/blog/${post.id}`} className="inline-flex items-center text-sm font-bold text-white hover:text-cyber-primary uppercase tracking-wider transition-colors mt-auto">
+                  <Link to={`/blog/${post.id}`} className="inline-flex items-center text-sm font-bold text-white hover:text-cyber-primary uppercase tracking-wider transition-colors mt-auto">
                     Read Article <ArrowRight size={16} className="ml-2" />
-                 </Link>
-              </div>
-            </article>
-          ))}
-        </div>
+                  </Link>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
         {/* Newsletter Signup */}
         <div className="mt-20 bg-gradient-to-r from-cyber-primary/10 to-cyber-secondary/10 p-12 rounded-2xl border border-white/10 text-center relative overflow-hidden">
