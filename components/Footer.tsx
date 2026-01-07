@@ -159,7 +159,7 @@ export const Footer: React.FC = () => {
         {/* Bottom Bar */}
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-gray-600 text-xs font-mono">
-            © 2024 Cyber Sync. All rights reserved.
+            © {new Date().getFullYear()} Cyber Sync. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-xs text-gray-500">
              <Link to="/privacy" className="hover:text-cyber-primary transition-colors flex items-center gap-1">
