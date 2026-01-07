@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Calendar, User, ArrowRight, CheckCircle2, Loader2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { BlogPost } from '../types';
+import { apiCall } from '../services/apiClient';
 
 export const Blog: React.FC = () => {
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -11,7 +12,7 @@ export const Blog: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('/api/blogs')
+    apiCall('blogs')
       .then(res => res.json())
       .then(data => {
         if (data.success && Array.isArray(data.blogs)) {
@@ -37,7 +38,7 @@ export const Blog: React.FC = () => {
     e.preventDefault();
     if (email && email.includes('@')) {
       setIsSubmitting(true);
-      fetch('/api/subscribe', {
+      apiCall('subscribe', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email })

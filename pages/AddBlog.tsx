@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { apiCall } from '../services/apiClient';
 
 const AddBlog = () => {
   const navigate = useNavigate();
@@ -23,7 +24,7 @@ const AddBlog = () => {
     }
 
     try {
-      const res = await fetch('/api/blogs', {
+      const res = await apiCall('blogs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 

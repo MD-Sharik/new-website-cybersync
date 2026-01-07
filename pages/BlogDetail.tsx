@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Calendar, User, Share2, Copy, Linkedin, Twitter, Check, Loader2 } from 'lucide-react';
 import { BlogPost } from '../types';
+import { apiCall } from '../services/apiClient';
 
 export const BlogDetail: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,7 +13,7 @@ export const BlogDetail: React.FC = () => {
   useEffect(() => {
     // Fetch blog post from API
     if (!id) return;
-    fetch(`/api/blogs/${id}`)
+    apiCall(`blogs/${id}`)
       .then(res => res.json())
       .then(data => {
         if (data.success && data.blog) {
